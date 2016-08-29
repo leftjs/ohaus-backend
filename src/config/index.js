@@ -4,5 +4,5 @@
 
 
 export default {
-	domain: process.env.NODE_ENV != 'production' ? 'http://localhost:3000' : 'http://ohaus.leftjs.com'
+	domain: process.env.NODE_ENV != 'production' ? 'http://localhost:6767' : 'http://ohaus.greenicetech.cn'
 }

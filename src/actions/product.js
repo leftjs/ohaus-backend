@@ -19,7 +19,7 @@ export const uploadProductZip = (body) => {
 	return dispatch => dispatch({
 		type: types.UPLOAD_PRODUCT_ZIP,
 		payload: new Promise((resolve, reject) => {
-			req.upload('/product/zip', body).then((data) => {
+			req.upload('/api/product/zip', body).then((data) => {
 				resolve(data)
 			}).catch((err) => {
 				reject(err)
@@ -32,7 +32,7 @@ export const getProductListByPageAndSize = ({page, size}) => {
 	return dispatch => dispatch({
 		type: types.GET_PRODUCT_LIST,
 		payload: new Promise((resolve, reject) => {
-			req.get('/product/list', {
+			req.get('/api/product/list', {
 				page,
 				size
 			}).then((data) => {
