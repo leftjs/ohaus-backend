@@ -11,6 +11,7 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 import product from './routes/product'
 import cors from 'cors'
+import fallback from 'express-history-api-fallback'
 
 var app = express();
 // 全局变量
@@ -35,9 +36,19 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/', routes);
-app.use('/users', users);
-app.use('/product', product)
+app.use('/api', routes);
+app.use('/api/users', users);
+app.use('/api/product', product)
+
+app.get('/', (req,res,next) => {
+	res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
+})
+
+const root = path.resolve(__dirname, 'public')
+app.use('/*', fallback('index.html', {root}))
+
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
