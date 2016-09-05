@@ -1,7 +1,7 @@
 # 奥豪斯后台管理及API DOC
 >
 	后台管理系统地址: http://ohaus.greenicetech.cn
-	api地址: http://ohaus.greenicetech.cn/api/
+	api地址: http://ohaus.greenicetech.cn/api
 	baseUrl: http://ohaus.greenicetech.cn
 	
 ---
@@ -20,7 +20,7 @@
 
 	desc: 根据传入的页码和每页条数返回产品列表，默认从第1页开始，每页默认十条
 	
-	url: (baseUrl)/api/list[?page={number|1}&size={number|10}]
+	url: (baseUrl)/api/product/list[?page={number|1}&size={number|10}]
 	
 	method: GET
 	
