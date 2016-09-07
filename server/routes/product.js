@@ -174,4 +174,12 @@ router.get('/list', (req,res,next) => {
 	})
 })
 
+router.delete('/single/:id', (req,res,next) => {
+	let id = req.params['id']
+	product.remove({_id: id}, (err, count) => {
+		if(err) return next(customError(400, err.message))
+		res.json({msg:`id为[${id}]的型号删除成功`})
+	})
+})
+
 export default router

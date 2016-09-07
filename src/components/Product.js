@@ -38,6 +38,12 @@ class Product extends React.Component {
 		this._fetchProductListByPageAndSize({page: this.state.currentPage, size: this.state.sizePerPage})
 	}
 
+	_handleItemDeleteClick = (id) => {
+		this.props.actions.deleteProductById(id).then((res) => {
+			Alert.success(res.value.message)
+		})
+	}
+
 	_fetchProductListByPageAndSize = ({page, size}) => {
 		this.props.actions.getProductListByPageAndSize({page, size}).then((res) => {
 			let data = res.value
@@ -47,7 +53,16 @@ class Product extends React.Component {
 				return {
 					_id: item._id,
 					name: item.name,
-					imageCount: item.images.size
+					imageCount: `${_.keys(item.images).length}张`,
+					dataCount: `${item.data.length}个`,
+					filterCount: `${item.filter.length}个`,
+					effectCount: `${item.effect.length}个`,
+					operation: <div>
+						<Button bsStyle="danger" bsSize="xsmall" onClick={this._handleItemDeleteClick.bind(this, item._id)}>删除</Button>
+						<Button bsStyle="info" bsSize="xsmall" style={{marginLeft: 10}} onClick={this._handleUploadSubmit}>详情</Button>
+
+					</div>
+
 				}
 			})
 			console.log('list', list)
@@ -125,6 +140,11 @@ class Product extends React.Component {
 							>
 								<TableHeaderColumn isKey={true} dataField="_id" dataAlign="center">产品编号</TableHeaderColumn>
 								<TableHeaderColumn dataField="name" dataAlign="center" >产品名称</TableHeaderColumn>
+								<TableHeaderColumn dataField="imageCount" dataAlign="center" >配图数量</TableHeaderColumn>
+								<TableHeaderColumn dataField="dataCount" dataAlign="center">筛选项数量</TableHeaderColumn>
+								<TableHeaderColumn dataField="filterCount" dataAlign="center">过滤项数量</TableHeaderColumn>
+								<TableHeaderColumn dataField="effectCount" dataAlign="center">变化项数量</TableHeaderColumn>
+								<TableHeaderColumn dataField="operation" dataAlign="center">操作</TableHeaderColumn>
 							</BootstrapTable>
 						</Panel>
 					</Col>

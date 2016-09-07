@@ -43,3 +43,16 @@ export const getProductListByPageAndSize = ({page, size}) => {
 		})
 	})
 }
+
+export const deleteProductById = (id) => {
+	return dispatch => dispatch({
+		type: types.DELETE_PRODUCT_BY_ID,
+		payload: new Promise((resolve, reject) => {
+			req.remove(`/api/product/single/${id}`).then((data) => {
+				resolve(data)
+			}).catch((err) => {
+				reject(err)
+			})
+		})
+	})
+}
