@@ -14,23 +14,6 @@ import mammoth from 'mammoth'
 
 require('shelljs/global')
 
-// { entryName: [Getter/Setter],
-// 	rawEntryName: [Getter],
-// 	extra: [Getter/Setter],
-// 	comment: [Getter/Setter],
-// 	name: [Getter],
-// 	isDirectory: [Getter],
-// 	getCompressedData: [Function],
-// 	getCompressedDataAsync: [Function],
-// 	setData: [Function],
-// 	getData: [Function],
-// 	getDataAsync: [Function],
-// 	attr: [Getter/Setter],
-// 	header: [Getter/Setter],
-// 	packHeader: [Function],
-// 	toString: [Function] }
-
-
 
 /**
  * 压缩包上传
@@ -72,6 +55,12 @@ router.put('/zip', upload.single('file'), (req,res,next) => {
 							// 去除键值的首尾空格
 							result[key.trim()] = value.trim()
 						}, {})
+					})
+					productData.data = _.map(productData.data, (item,index) => {
+						return {
+							...item,
+							id: index
+						}
 					})
 					let json2 = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[1]])
 					let jsonResult = _.reduce(json2, (result,item) => {
@@ -147,7 +136,9 @@ router.put('/zip', upload.single('file'), (req,res,next) => {
 	rm('-rf', `./${req.file.path}`)
 })
 
-
+/**
+ * 获取所有的产品列表
+ */
 router.get('/list/all',(req, res, next) => {
 	product.find({},(err, list) => {
 		if(err) return next(err)
@@ -155,6 +146,9 @@ router.get('/list/all',(req, res, next) => {
 	})
 })
 
+/**
+ * 分页获取产品列表
+ */
 router.get('/list', (req,res,next) => {
 	let page = !!parseInt(req.query['page']) ? parseInt(req.query['page']) : 1
 	let size = !!parseInt(req.query['size']) ? parseInt(req.query['size']) : 10
@@ -174,11 +168,69 @@ router.get('/list', (req,res,next) => {
 	})
 })
 
+/**
+ * 删除某个产品
+ */
 router.delete('/single/:id', (req,res,next) => {
 	let id = req.params['id']
 	product.remove({_id: id}, (err, count) => {
 		if(err) return next(customError(400, err.message))
-		res.json({msg:`id为[${id}]的型号删除成功`})
+		res.json({msg:`id为[${id}]的产品删除成功`})
+	})
+})
+
+/**
+ * 为指定产品上传配图
+ */
+router.post('/:id/image/upload', upload.single('file'), (req,res,next) => {
+	product.findOne({_id: req.params['id']}, (err,doc) => {
+		if (err) return next(customError(400, err.message))
+		if (!doc) return next(customError(400, "找不到该产品,请检查"))
+		ossUtils.uploadSingleWithFile(req.file).then((url) => {
+			doc.images[req.file.originalname.replace(/(\.|-)/g, '_')] = url
+			product.update({_id: doc._id}, {$set: {
+				images: doc.images
+			}},(err, result) => {
+				if (err) return next(customError(400, err.message))
+				if (result.ok < 1) return next(customError(400, "更新失败,请检查"))
+				res.json(result)
+			})
+		}).catch((err) => {
+			console.log(err)
+			return next(customError(400, err.message))
+		})
+	})
+})
+
+/**
+ * 为指定产品删除某个配图
+ */
+router.delete('/:id/image/:name', (req,res,next) => {
+	let id = req.params['id']
+	let name = req.params['name']
+	product.findOne({_id: id}, (err, doc) => {
+		if (err) return next(customError(400, err.message))
+		if (!doc) return next(customError(400, "找不到该产品,请检查"))
+		delete doc.images[name]
+		product.update({_id: doc._id}, {$set: {
+			images: doc.images
+		}}, (err, result) => {
+			if (err) return next(customError(400, err.message))
+			if (result.ok < 1) return next(customError(400, "更新失败,请检查"))
+			res.json(result)
+		})
+	})
+})
+
+/**
+ * 获取指定产品
+ */
+router.get('/:id', (req,res,next) => {
+	let id = req.params['id']
+	product.findOne({_id: id}, (err, doc) => {
+		if (err) return next(customError(400, err.message))
+		if (!doc) return next(customError(400, "找不到该产品,请检查"))
+		res.json(doc)
 	})
 })
 

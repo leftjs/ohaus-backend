@@ -17,7 +17,7 @@ var client = new OSS({
 
 export const uploadSingleWithFile = (file) => {
 	client.useBucket(ossConfig.bucketName)
-	return client.put(`${uuid.v4()}.${file.mimetype.split('\/')[1]}`, file.buffer).then((res) => {
+	return client.put(`${uuid.v4()}.${file.mimetype.split('\/')[1]}`, !!file.buffer ? file.buffer : file.path).then((res) => {
 		return Promise.resolve(res.url)
 	}).catch((err) => {
 		console.log(err)

@@ -8,6 +8,7 @@ import actions from '../actions'
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert'
+import {browserHistory} from 'react-router'
 
 
 
@@ -40,8 +41,14 @@ class Product extends React.Component {
 
 	_handleItemDeleteClick = (id) => {
 		this.props.actions.deleteProductById(id).then((res) => {
-			Alert.success(res.value.message)
+			this._fetchProductListByPageAndSize({page: this.state.currentPage, size: this.state.sizePerPage})
+			Alert.success(res.value.msg)
 		})
+	}
+
+	_handleItemDetailClick = (id) => {
+		browserHistory.push(`/product/${id}`)
+
 	}
 
 	_fetchProductListByPageAndSize = ({page, size}) => {
@@ -59,7 +66,7 @@ class Product extends React.Component {
 					effectCount: `${item.effect.length}个`,
 					operation: <div>
 						<Button bsStyle="danger" bsSize="xsmall" onClick={this._handleItemDeleteClick.bind(this, item._id)}>删除</Button>
-						<Button bsStyle="info" bsSize="xsmall" style={{marginLeft: 10}} onClick={this._handleUploadSubmit}>详情</Button>
+						<Button bsStyle="info" bsSize="xsmall" style={{marginLeft: 10}} onClick={this._handleItemDetailClick.bind(this, item._id)}>详情</Button>
 
 					</div>
 
@@ -89,6 +96,7 @@ class Product extends React.Component {
 		data.append('file', this.state.zip)
 		this.props.actions.uploadProductZip(data).then((result) => {
 			Alert.success("录入成功")
+			this._fetchProductListByPageAndSize({page: this.state.currentPage, size: this.state.sizePerPage})
 		}).catch((err) => {
 			Alert.error("录入失败")
 		})
@@ -149,6 +157,7 @@ class Product extends React.Component {
 						</Panel>
 					</Col>
 				</Row>
+
 			</Grid>
 		)
 	}

@@ -21,7 +21,7 @@ class Container extends React.Component {
 					</Navbar.Header>
 					<Nav>
 						<NavItem eventKey={1} onClick={() => {
-							browserHistory.push('/product')
+							browserHistory.push('/products')
 						}}>产品管理</NavItem>
 						<NavItem eventKey={2} href="#">Link</NavItem>
 						<NavDropdown eventKey={3} title="Dropdown" id="basic-nav-dropdown">
