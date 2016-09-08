@@ -9,6 +9,7 @@ import Main from './components/Main'
 import Home from './components/Home'
 import Product from './components/Product'
 import ProductDetail from './components/ProductDetail'
+import User from './components/User'
 
 const store = configureStore();
 const history = syncHistoryWithStore(browserHistory, store)
@@ -21,6 +22,7 @@ render(
 			  <IndexRoute component={Home} />
 			  <Route path="products" component={Product} />
 			  <Route path="product/:id" component={ProductDetail}/>
+			  <Route path="users" component={User}/>
 		  </Route>
 	  </Router>
   </Provider>,

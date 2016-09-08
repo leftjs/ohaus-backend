@@ -91,11 +91,92 @@ export const deleteProductImageByName = ({id,name}) => {
 	})
 }
 
+/**
+ * 获取单个产品信息
+ * @param id
+ * @returns {function(*): *}
+ */
 export const getSingleProduct = (id) => {
 	return dispatch => dispatch({
 		type: types.GET_SINGLE_PRODUCT,
 		payload: new Promise((resolve, reject) => {
 			req.get(`/api/product/${id}`).then((data) => {
+				resolve(data)
+			}).catch((err) => {
+				reject(err)
+			})
+		})
+	})
+}
+
+/**
+ * 删除指定产品的指定参数
+ * @param id
+ * @param no
+ * @returns {function(*): *}
+ */
+export const deleteProductDataById = ({id, no}) => {
+	return dispatch => dispatch({
+		type: types.DELETE_PRODUCT_DATA_BY_ID,
+		payload: new Promise((resolve, reject) => {
+			req.remove(`/api/product/${id}/data/${no}`).then((data) => {
+				resolve(data)
+			}).catch((err) => {
+				reject(err)
+			})
+		})
+	})
+}
+
+/**
+ * 更新指定产品的参数
+ * @param id
+ * @param item
+ * @returns {function(*): *}
+ */
+export const updateProductDataById = ({id,item}) => {
+	return dispatch => dispatch({
+		type: types.UPDATE_PRODUCT_DATA_BY_ID,
+		payload: new Promise((resolve, reject) => {
+			req.put(`/api/product/${id}/data`, {item}).then((data) => {
+				resolve(data)
+			}).catch((err) => {
+				reject(err)
+			})
+		})
+	})
+}
+
+/**
+ * 为指定产品添加参数
+ * @param id
+ * @param item
+ * @returns {function(*): *}
+ */
+export const addProductDataById = ({id, item}) => {
+	return dispatch => dispatch({
+		type: types.ADD_PRODUCT_DATA_BY_ID,
+		payload: new Promise((resolve, reject)=> {
+			req.post(`/api/product/${id}/data`, {item}).then((data) => {
+				resolve(data)
+			}).catch((err) => {
+				reject(err)
+			})
+		})
+	})
+}
+
+/**
+ * 更新指定产品的描述信息
+ * @param id
+ * @param desc
+ * @returns {function(*): *}
+ */
+export const updateProductDescById = ({id, desc}) => {
+	return dispatch => dispatch({
+		type: types.UPDATE_PRODUCT_DESC_BY_ID,
+		payload: new Promise((resolve, reject) => {
+			req.put(`/api/product/${id}/desc`, {desc}).then((data) => {
 				resolve(data)
 			}).catch((err) => {
 				reject(err)

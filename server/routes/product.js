@@ -179,6 +179,17 @@ router.delete('/single/:id', (req,res,next) => {
 	})
 })
 
+Promise.prototype.finally = function (callback) {
+	let p = this.constructor;
+	// We don’t invoke the callback in here,
+	// because we want then() to handle its exceptions
+	return this.then(
+		// Callback fulfills: pass on predecessor settlement
+		// Callback rejects: pass on rejection (=omit 2nd arg.)
+		value  => p.resolve(callback()).then(() => value),
+		reason => p.resolve(callback()).then(() => { throw reason })
+	);
+};
 /**
  * 为指定产品上传配图
  */
@@ -198,6 +209,9 @@ router.post('/:id/image/upload', upload.single('file'), (req,res,next) => {
 		}).catch((err) => {
 			console.log(err)
 			return next(customError(400, err.message))
+		}).finally(() => {
+			// 用后即焚
+			rm('-rf', `./${req.file.path}`)
 		})
 	})
 })
@@ -231,6 +245,109 @@ router.get('/:id', (req,res,next) => {
 		if (err) return next(customError(400, err.message))
 		if (!doc) return next(customError(400, "找不到该产品,请检查"))
 		res.json(doc)
+	})
+})
+
+/**
+ * 删除指定产品的某个参数
+ */
+router.delete('/:id/data/:no', (req,res,next) => {
+	let id = req.params['id']
+	let no = req.params['no']
+
+	product.findOne({_id: id}, (err, doc) => {
+		if (err) return next(customError(400, err.message))
+		if (!doc) return next(customError(400, "找不到该产品,请检查"))
+		let data = doc.data
+		data = _.reject(data, (item) => {
+			return item.id == no
+		})
+		product.update({_id: id}, {$set: {
+			data: data
+		}}, (err, result) => {
+			if (err) return next(customError(400, err.message))
+			if (result.ok < 1) return next(customError(400, "更新失败,请检查"))
+			res.json('更新成功')
+		})
+	})
+})
+
+/**
+ * 更新指定产品的某个参数
+ */
+router.put('/:id/data', (req, res, next) => {
+
+	let id = req.params['id']
+	let body = req.body.item
+	delete body.operation
+	product.findOne({_id: id}, (err,doc) => {
+		if (err) return next(customError(400, err.message))
+		if (!doc) return next(customError(400, "找不到该产品,请检查"))
+		let data = doc.data
+		data = _.map(data, (item) => {
+			if (item.id == body.id) {
+				return body
+			}else {
+				return item
+			}
+		})
+		product.update({_id: id}, {$set: {
+			data: data
+		}}, (err, result) => {
+			if (err) return next(customError(400, err.message))
+			if (result.ok < 1) return next(customError(400, "更新失败,请检查"))
+			res.json('更新成功')
+		})
+	})
+})
+
+/**
+ * 为指定产品添加参数
+ */
+router.post('/:id/data', (req,res,next) => {
+	let id = req.params['id']
+	let body = req.body.item
+	product.findOne({_id: id}, (err, doc) => {
+		if (err) return next(customError(400, err.message))
+		if (!doc) return next(customError(400, "找不到该产品,请检查"))
+		let data = doc.data
+		let no = -1
+		_.map(data, (item) => {
+			if (item.id > no) {
+				no = item.id
+			}
+		})
+		no++ // 获取最后一个id号
+		data.push({
+			id: no,
+			...body
+		})
+		product.update({_id: id}, {$set: {
+			data
+		}}, (err, result) => {
+			if (err) return next(customError(400, err.message))
+			if (result.ok < 1) return next(customError(400, "更新失败,请检查"))
+			res.json('更新成功')
+		})
+	})
+})
+
+/**
+ * 更新指定产品的描述
+ */
+router.put('/:id/desc', (req,res,next) => {
+	let id = req.params['id']
+	let desc = req.body.desc
+	product.findOne({_id: id}, (err,doc) => {
+		if (err) return next(customError(400, err.message))
+		if (!doc) return next(customError(400, "找不到该产品,请检查"))
+		product.update({_id: id}, {$set: {
+			desc
+		}},(err,result) => {
+			if (err) return next(customError(400, err.message))
+			if (result.ok < 1) return next(customError(400, "更新失败,请检查"))
+			res.json('更新成功')
+		})
 	})
 })
 
