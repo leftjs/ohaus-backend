@@ -23,7 +23,7 @@ export const uploadProductZip = (body) => {
 	return dispatch => dispatch({
 		type: types.UPLOAD_PRODUCT_ZIP,
 		payload: new Promise((resolve, reject) => {
-			req.upload('/api/product/zip', body).then((data) => {
+			req.upload('/api/products/zip', body).then((data) => {
 				resolve(data)
 			}).catch((err) => {
 				reject(err)
@@ -42,7 +42,7 @@ export const getProductListByPageAndSize = ({page, size}) => {
 	return dispatch => dispatch({
 		type: types.GET_PRODUCT_LIST,
 		payload: new Promise((resolve, reject) => {
-			req.get('/api/product/list', {
+			req.get('/api/products/list', {
 				page,
 				size
 			}).then((data) => {
@@ -63,7 +63,7 @@ export const deleteProductById = (id) => {
 	return dispatch => dispatch({
 		type: types.DELETE_PRODUCT_BY_ID,
 		payload: new Promise((resolve, reject) => {
-			req.remove(`/api/product/single/${id}`).then((data) => {
+			req.remove(`/api/products/single/${id}`).then((data) => {
 				resolve(data)
 			}).catch((err) => {
 				reject(err)
@@ -82,7 +82,7 @@ export const deleteProductImageByName = ({id,name}) => {
 	return dispatch => dispatch({
 		type: types.DELETE_PRODUCT_IMAGE_BY_NAME,
 		payload: new Promise((resolve, reject) => {
-			req.remove(`/api/product/${id}/image/${name}`).then((data) => {
+			req.remove(`/api/products/${id}/image/${name}`).then((data) => {
 				 resolve(data)
 			}).catch((err) => {
 				reject(err)
@@ -100,7 +100,7 @@ export const getSingleProduct = (id) => {
 	return dispatch => dispatch({
 		type: types.GET_SINGLE_PRODUCT,
 		payload: new Promise((resolve, reject) => {
-			req.get(`/api/product/${id}`).then((data) => {
+			req.get(`/api/products/${id}`).then((data) => {
 				resolve(data)
 			}).catch((err) => {
 				reject(err)
@@ -119,7 +119,7 @@ export const deleteProductDataById = ({id, no}) => {
 	return dispatch => dispatch({
 		type: types.DELETE_PRODUCT_DATA_BY_ID,
 		payload: new Promise((resolve, reject) => {
-			req.remove(`/api/product/${id}/data/${no}`).then((data) => {
+			req.remove(`/api/products/${id}/data/${no}`).then((data) => {
 				resolve(data)
 			}).catch((err) => {
 				reject(err)
@@ -138,7 +138,7 @@ export const updateProductDataById = ({id,item}) => {
 	return dispatch => dispatch({
 		type: types.UPDATE_PRODUCT_DATA_BY_ID,
 		payload: new Promise((resolve, reject) => {
-			req.put(`/api/product/${id}/data`, {item}).then((data) => {
+			req.put(`/api/products/${id}/data`, {item}).then((data) => {
 				resolve(data)
 			}).catch((err) => {
 				reject(err)
@@ -157,7 +157,7 @@ export const addProductDataById = ({id, item}) => {
 	return dispatch => dispatch({
 		type: types.ADD_PRODUCT_DATA_BY_ID,
 		payload: new Promise((resolve, reject)=> {
-			req.post(`/api/product/${id}/data`, {item}).then((data) => {
+			req.post(`/api/products/${id}/data`, {item}).then((data) => {
 				resolve(data)
 			}).catch((err) => {
 				reject(err)
@@ -176,7 +176,7 @@ export const updateProductDescById = ({id, desc}) => {
 	return dispatch => dispatch({
 		type: types.UPDATE_PRODUCT_DESC_BY_ID,
 		payload: new Promise((resolve, reject) => {
-			req.put(`/api/product/${id}/desc`, {desc}).then((data) => {
+			req.put(`/api/products/${id}/desc`, {desc}).then((data) => {
 				resolve(data)
 			}).catch((err) => {
 				reject(err)

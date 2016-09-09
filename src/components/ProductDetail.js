@@ -236,8 +236,8 @@ class ProductDetail extends React.Component {
 						  		    }).catch((err) => {
 						  		    	Alert.error('更新失败')
 						  		    })
-						  	}
-						  }}
+								    }
+								  }}
 								>
 									<TableHeaderColumn dataField="id" isKey={true} dataAlign="center">编号</TableHeaderColumn>
 
