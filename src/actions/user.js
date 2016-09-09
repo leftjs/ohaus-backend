@@ -30,11 +30,11 @@ export const login = ({username, password}) => {
  * @param nickname
  * @returns {function(*): *}
  */
-export const register = ({username, password, nickname}) => {
+export const register = ({username, password, name, phone, email, company, job,city}) => {
 	return dispatch => dispatch({
 		type: types.REGISTER,
 		payload: new Promise((resolve, reject) => {
-			req.post('/api/users/register', {username, password, nickname}).then((data) => {
+			req.post('/api/users/register', {username, password, name, phone, email, company, job, city}).then((data) => {
 				resolve(data)
 			}).catch((err) => {
 				reject(err)

@@ -8,8 +8,14 @@ import User from '../models/user'
 router.post('/register', (req,res,next) => {
 	let username = req.body.username
 	let password = req.body.password
-	let nickname = req.body.nickname
-	User.create({username, password, nickname}, (err,user) => {
+	let name = req.body.name
+	let email = req.body.email
+	let company = req.body.company
+	let job = req.body.job
+	let city = req.body.city
+	let phone = req.body.phone
+	User.create({username, password, name, email, company, job, city, phone}, (err,user) => {
+		console.log(err)
 		if(err) return next(customError(400, err.message))
 		if(!user) return next(customError(400, '用户创建出错'))
 		res.json(user)

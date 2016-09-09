@@ -21,6 +21,42 @@ class User extends React.Component {
 
 	}
 
+	inputField = [
+	{
+		id: 'username',
+		label: '用户名',
+		type: 'text'
+	}, {
+		id: 'password',
+		label: '密码',
+		type: 'text'
+	}, {
+		id: 'name',
+		label: '姓名',
+		type: 'text'
+	}, {
+		id: 'email',
+		label: '邮箱',
+		type: 'email'
+	}, {
+		id: 'company',
+		label: '公司',
+		type: 'text'
+	}, {
+		id: 'job',
+		label: '职务',
+		type: 'text'
+	}, {
+		id: 'city',
+		label: '城市',
+		type: 'text'
+	}, {
+		id: 'phone',
+		label: '手机号',
+		type: 'number'
+	}
+]
+
 	_handleRegisterInputChange(key, e) {
 		this.setState({
 			registerEntity: {
@@ -32,13 +68,19 @@ class User extends React.Component {
 
 	_handleRegisterSubmit(e) {
 		// this.props.actions.register({})
+		console.log(this.state)
 		e.preventDefault()
 		let entity = this.state.registerEntity
 		let username = entity.username
 		let password = entity.password
-		let nickname = entity.nickname
-		if(!!username && !!password && !!nickname) {
-			this.props.actions.register({username, password, nickname}).then((data) => {
+		let name = entity.name
+		let email = entity.email
+		let company = entity.company
+		let job = entity.job
+		let city = entity.city
+		let phone = entity.phone
+		if(!!username && !!password && !!name && !!email && !!company && !!job && !!city && !!phone) {
+			this.props.actions.register({username, password, name, email, company, job, city, phone}).then((data) => {
 				Alert.success("注册成功")
 				this._loadUsersList(this.state.currentPage, this.state.sizePerPage)
 			}).catch((err) => {
@@ -85,36 +127,31 @@ class User extends React.Component {
 		})
 	}
 
+
 	render() {
+
+
 		return (
 			<div>
 				<Col xs={12} sm={10} md={10} smOffset={1} mdOffset={1}>
 					<Panel header="用户注册" bsStyle="primary">
 						<Form horizontal>
-							<FormGroup controlId="username">
-								<Col componentClass={ControlLabel} sm={2}>
-									用户名
-								</Col>
-								<Col sm={10}>
-									<FormControl type="text" placeholder="用户名" onChange={this._handleRegisterInputChange.bind(this, 'username')}/>
-								</Col>
-							</FormGroup>
-							<FormGroup controlId="password">
-								<Col componentClass={ControlLabel} sm={2}>
-									密码
-								</Col>
-								<Col sm={10}>
-									<FormControl type="password" placeholder="密码" onChange={this._handleRegisterInputChange.bind(this, 'password')}/>
-								</Col>
-							</FormGroup>
-							<FormGroup controlId="nickname">
-								<Col componentClass={ControlLabel} sm={2}>
-									昵称
-								</Col>
-								<Col sm={10}>
-									<FormControl type="text" placeholder="昵称" onChange={this._handleRegisterInputChange.bind(this, 'nickname')}/>
-								</Col>
-							</FormGroup>
+
+							{
+								_.map(this.inputField, (item) => {
+									return (
+										<FormGroup controlId={item.id} key={item.id}>
+											<Col componentClass={ControlLabel} sm={2}>
+												{item.label}
+											</Col>
+											<Col sm={10}>
+												<FormControl type={item.type} placeholder={item.label} onChange={this._handleRegisterInputChange.bind(this, item.id)}/>
+											</Col>
+										</FormGroup>
+									)
+								})
+							}
+
 							<FormGroup>
 								<Col smOffset={2} sm={10}>
 									<Button type="submit" onClick={this._handleRegisterSubmit.bind(this)}>
@@ -162,7 +199,12 @@ class User extends React.Component {
 							<TableHeaderColumn dataAlign="center" dataField="_id" isKey={true}>编号</TableHeaderColumn>
 							<TableHeaderColumn dataAlign="center" dataField="username">用户名</TableHeaderColumn>
 							<TableHeaderColumn dataAlign="center" dataField="password">密码</TableHeaderColumn>
-							<TableHeaderColumn dataAlign="center" dataField="nickname">昵称</TableHeaderColumn>
+							<TableHeaderColumn dataAlign="center" dataField="name">昵称</TableHeaderColumn>
+							<TableHeaderColumn dataAlign="center" dataField="phone">手机号</TableHeaderColumn>
+							<TableHeaderColumn dataAlign="center" dataField="email">邮箱</TableHeaderColumn>
+							<TableHeaderColumn dataAlign="center" dataField="city">城市</TableHeaderColumn>
+							<TableHeaderColumn dataAlign="center" dataField="company">公司</TableHeaderColumn>
+							<TableHeaderColumn dataAlign="center" dataField="job">职务</TableHeaderColumn>
 							<TableHeaderColumn dataAlign="center" dataField="operation">操作</TableHeaderColumn>
 						</BootstrapTable>
 					</Panel>

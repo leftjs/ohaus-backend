@@ -16,10 +16,30 @@ const userSchema = Schema({
 		type: String,
 		required: true
 	}, // 密码
-	nickname: {
+	name: {
 		type: String,
 		required: true
-	},  // 昵称
+	},  // 姓名
+	email: {
+		type: String,
+		required: true,
+	},
+	company: {
+		type: String,
+		required: true
+	},
+	job: {
+		type: String,
+		required: true
+	},
+	city: {
+		type: String,
+		required: true
+	},
+	phone: {
+		type: String,
+		required: true
+	}
 
 })
 
