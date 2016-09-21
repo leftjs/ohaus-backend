@@ -10,6 +10,7 @@ import config from './config'
 var routes = require('./routes/index');
 var users = require('./routes/users');
 import product from './routes/product'
+import category from './routes/category'
 import cors from 'cors'
 import fallback from 'express-history-api-fallback'
 
@@ -39,6 +40,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api', routes);
 app.use('/api/users', users);
 app.use('/api/products', product)
+app.use('/api/category', category)
 
 app.get('/', (req,res,next) => {
 	res.sendFile(path.resolve(__dirname, 'public', 'index.html'))

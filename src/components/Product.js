@@ -2,14 +2,14 @@
  * Created by zhangjiasheng on 16/8/25.
  */
 import React from 'react'
-import { Grid, Row, Col, Panel, FormControl, FormGroup, Form, ControlLabel, HelpBlock, Button} from 'react-bootstrap'
+import { Grid, Row, Col, Panel, FormControl, FormGroup, Form, ControlLabel, HelpBlock, Button, ButtonToolbar, DropdownButton, MenuItem} from 'react-bootstrap'
 import {BootstrapTable,TableHeaderColumn} from 'react-bootstrap-table'
 import actions from '../actions'
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert'
 import {browserHistory} from 'react-router'
-
+require('../styles/App.css')
 
 
 const FieldGroup = ({ id, label, help, ...props }) => {
@@ -28,14 +28,25 @@ class Product extends React.Component {
 		sizePerPage: 10,
 		currentPage: 1,
 		totalDataSize: 0,
+		categories: []
+	}
+
+	_getAllCategories = () => {
+		this.props.actions.getAllCategories().then((res) => {
+			this.setState({
+				categories: res.value
+			})
+		}).catch((err) =>{
+			console.log(err)
+			err.res.then((msg) => {
+				Alert.err(msg)
+			})
+		})
 	}
 
 
-	// data: list,
-	// totalDataSize: count,
-	// sizePerPage: parseInt(size),
-	// currentPage: parseInt(page)
 	componentWillMount() {
+		this._getAllCategories()
 		this._fetchProductListByPageAndSize({page: this.state.currentPage, size: this.state.sizePerPage})
 	}
 
@@ -48,14 +59,43 @@ class Product extends React.Component {
 
 	_handleItemDetailClick = (id) => {
 		browserHistory.push(`/product/${id}`)
+	}
 
+	_handleCategorySelect = (productId, categoryId, subCategoryId) => {
+		// TODO 分类选择
+	}
+
+	_getCategoryFromId = (category = {}, categories) => {
+		let {id, subId} = category
+		if (!id && !subId) {
+			return '请选择'
+		} else {
+			let firstCategory = _.takeWhile(categories, (item) => {
+				return item._id == id
+			})
+			let subCategory = _.takeWhile(categories, (item) => {
+				return item._id == subId
+			})
+			return `${firstCategory} - ${subCategory}`
+		}
+	}
+
+	_renderCategoryDropDown = (productId, categories) => {
+		let renderArr = []
+		_.forEach(categories, (item) => {
+			renderArr.push(<MenuItem header key={item._id}>{item.name}</MenuItem>)
+			_.forEach(item.subs, (inlineItem) => {
+				renderArr.push(<MenuItem key={inlineItem._id} onSelect={this._handleCategorySelect.bind(this, productId, item._id, inlineItem._id)}>{inlineItem.name}</MenuItem>)
+			})
+			renderArr.push(<MenuItem divider key={item._id + 'divider'}/>)
+		})
+		return renderArr
 	}
 
 	_fetchProductListByPageAndSize = ({page, size}) => {
 		this.props.actions.getProductListByPageAndSize({page, size}).then((res) => {
 			let data = res.value
 			let list = data.data
-			console.log(list)
 			list = _.map(list, (item) => {
 				return {
 					_id: item._id,
@@ -64,15 +104,17 @@ class Product extends React.Component {
 					dataCount: `${item.data.length}个`,
 					filterCount: `${item.filter.length}个`,
 					effectCount: `${item.effect.length}个`,
+					category:
+							<DropdownButton bsSize="xsmall" bsStyle="default" title={!!this.state.categories ? this._getCategoryFromId(item.category, this.state.categories) : '未知'} noCaret>
+								{ !!this.state.categories ? this._renderCategoryDropDown(item._id, this.state.categories) : null}
+							</DropdownButton>,
 					operation: <div>
 						<Button bsStyle="danger" bsSize="xsmall" onClick={this._handleItemDeleteClick.bind(this, item._id)}>删除</Button>
 						<Button bsStyle="info" bsSize="xsmall" style={{marginLeft: 10}} onClick={this._handleItemDetailClick.bind(this, item._id)}>详情</Button>
-
 					</div>
 
 				}
 			})
-			console.log('list', list)
 			this.setState({
 				products: list,
 				totalDataSize: data.totalDataSize,
@@ -129,6 +171,9 @@ class Product extends React.Component {
 					<Col xs={12} sm={10} md={10} smOffset={1} mdOffset={1}>
 						<Panel header="产品信息管理" bsStyle="success">
 							<BootstrapTable
+								bodyStyle={{
+									overflow: 'visible'
+								}}
 								data={this.state.products}
 							  striped={true}
 							  hover={true}
@@ -148,6 +193,7 @@ class Product extends React.Component {
 							>
 								<TableHeaderColumn isKey={true} dataField="_id" dataAlign="center">产品编号</TableHeaderColumn>
 								<TableHeaderColumn dataField="name" dataAlign="center" >产品名称</TableHeaderColumn>
+								<TableHeaderColumn dataField="category" dataAlign="center" columnClassName="td-overflow-visible" >分类</TableHeaderColumn>
 								<TableHeaderColumn dataField="imageCount" dataAlign="center" >配图数量</TableHeaderColumn>
 								<TableHeaderColumn dataField="dataCount" dataAlign="center">筛选项数量</TableHeaderColumn>
 								<TableHeaderColumn dataField="filterCount" dataAlign="center">过滤项数量</TableHeaderColumn>

@@ -19,7 +19,7 @@ function filterStatus(res) {
 	}
 	else {
 		let error = new Error(res.statusText);
-		error.res = res;
+		error.res = res.json();
 		error.type = 'http';
 		throw error;
 	}

@@ -15,7 +15,11 @@ const productSchema = Schema({
 	data: Array, // 全体数据
 	filter: Array, // 筛选项
 	effect: Array, // 变化项
-	desc: String
+	desc: String,
+	category: {
+		id: String,
+		subId: String
+	}
 })
 
 export default mongoose.model('Product', productSchema)

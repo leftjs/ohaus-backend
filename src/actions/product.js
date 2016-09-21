@@ -184,3 +184,22 @@ export const updateProductDescById = ({id, desc}) => {
 		})
 	})
 }
+
+/**
+ * 更新指定产品分类
+ * @param id
+ * @param category
+ * @returns {function(*): *}
+ */
+export const updateProductCategoryById = ({id, category}) => {
+	return dispatch => dispatch({
+		type: types.UPDATE_PRODUCT_CATEGORY_BY_ID,
+		payload: new Promise((resolve, reject) => {
+			req.put(`/api/products/${id}/category`, {id: category.id, subId: category.subId}).then((data) => {
+				resolve(data)
+			}).catch((err) => {
+				reject(err)
+			})
+		})
+	})
+}

@@ -10,6 +10,7 @@ import Home from './components/Home'
 import Product from './components/Product'
 import ProductDetail from './components/ProductDetail'
 import User from './components/User'
+import Category from './components/Category'
 
 const store = configureStore();
 const history = syncHistoryWithStore(browserHistory, store)
@@ -23,6 +24,7 @@ render(
 			  <Route path="products" component={Product} />
 			  <Route path="product/:id" component={ProductDetail}/>
 			  <Route path="users" component={User}/>
+			  <Route path="category" component={Category}/>
 		  </Route>
 	  </Router>
   </Provider>,

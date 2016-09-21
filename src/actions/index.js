@@ -3,9 +3,10 @@
  */
 import * as product from './product'
 import * as user from './user'
+import * as category from './category'
 
 export default {
 	...product,
-	...user
-
+	...user,
+	...category
 }

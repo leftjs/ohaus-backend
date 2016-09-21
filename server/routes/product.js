@@ -249,6 +249,18 @@ router.get('/:id', (req,res,next) => {
 })
 
 /**
+ * 更新指定产品分类
+ */
+router.put('/:id/category', (req,res,next) => {
+	let id = req.params['id']
+	let category = req.body.category
+	product.update({_id: id}, {$set: {category}}, (err,result) => {
+		if (err) return next(customError(400, err.message))
+		res.json(result)
+	})
+})
+
+/**
  * 删除指定产品的某个参数
  */
 router.delete('/:id/data/:no', (req,res,next) => {

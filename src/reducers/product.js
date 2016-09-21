@@ -5,7 +5,6 @@
 import * as types from '../actions/const'
 
 export const product = (state={}, action) => {
-	console.log(action)
 	switch (action.type) {
 		case `${types.SAY_HELLO}_FULFILLED`:
 			return {

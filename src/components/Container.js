@@ -26,7 +26,9 @@ class Container extends React.Component {
 						<NavItem eventKey={2} onClick={() => {
 							browserHistory.push('/users')
 						}}>用户管理</NavItem>
-
+						<NavItem eventKey={3} onClick={() => {
+							browserHistory.push('/category')
+						}}>类别管理</NavItem>
 					</Nav>
 				</Navbar>
 				{this.props.children}
