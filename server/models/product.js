@@ -15,11 +15,9 @@ const productSchema = Schema({
 	data: Array, // 全体数据
 	filter: Array, // 筛选项
 	effect: Array, // 变化项
-	desc: String,
-	category: {
-		id: String,
-		subId: String
-	}
+	desc: String, // 描述
+	categoryId: String, // 一级分类
+	subCategoryId: String, // 二级分类
 })
 
 export default mongoose.model('Product', productSchema)

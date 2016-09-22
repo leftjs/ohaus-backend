@@ -152,20 +152,62 @@ router.get('/list/all',(req, res, next) => {
 router.get('/list', (req,res,next) => {
 	let page = !!parseInt(req.query['page']) ? parseInt(req.query['page']) : 1
 	let size = !!parseInt(req.query['size']) ? parseInt(req.query['size']) : 10
+	let categoryId = req.query['cid']
+	let subCategoryId = req.query['scid']
 	if (page < 1) page = 1
-	console.log(page, size)
-	product.count({}, (err, count) => {
-		if(err) return next(customError(400, err.message))
-		product.find({}).skip(parseInt((page - 1 ) * size)).limit(parseInt(size)).exec((err, list) => {
+	if (!!categoryId && !subCategoryId) {
+		product.count({categoryId}, (err, count) => {
 			if(err) return next(customError(400, err.message))
-			res.json({
-				data: list,
-				totalDataSize: count,
-				sizePerPage: parseInt(size),
-				currentPage: parseInt(page)
+			product.find({categoryId}).skip(parseInt((page - 1 ) * size)).limit(parseInt(size)).exec((err, list) => {
+				if(err) return next(customError(400, err.message))
+				res.json({
+					data: list,
+					totalDataSize: count,
+					sizePerPage: parseInt(size),
+					currentPage: parseInt(page)
+				})
 			})
 		})
-	})
+	} else if (!!categoryId && !!subCategoryId) {
+		product.count({categoryId, subCategoryId}, (err, count) => {
+			if(err) return next(customError(400, err.message))
+			product.find({categoryId, subCategoryId}).skip(parseInt((page - 1 ) * size)).limit(parseInt(size)).exec((err, list) => {
+				if(err) return next(customError(400, err.message))
+				res.json({
+					data: list,
+					totalDataSize: count,
+					sizePerPage: parseInt(size),
+					currentPage: parseInt(page)
+				})
+			})
+		})
+	} else if (!!subCategoryId && !categoryId) {
+		product.count({subCategoryId}, (err, count) => {
+			if(err) return next(customError(400, err.message))
+			product.find({subCategoryId}).skip(parseInt((page - 1 ) * size)).limit(parseInt(size)).exec((err, list) => {
+				if(err) return next(customError(400, err.message))
+				res.json({
+					data: list,
+					totalDataSize: count,
+					sizePerPage: parseInt(size),
+					currentPage: parseInt(page)
+				})
+			})
+		})
+	} else {
+		product.count({}, (err, count) => {
+			if(err) return next(customError(400, err.message))
+			product.find({}).skip(parseInt((page - 1 ) * size)).limit(parseInt(size)).exec((err, list) => {
+				if(err) return next(customError(400, err.message))
+				res.json({
+					data: list,
+					totalDataSize: count,
+					sizePerPage: parseInt(size),
+					currentPage: parseInt(page)
+				})
+			})
+		})
+	}
 })
 
 /**
@@ -254,8 +296,10 @@ router.get('/:id', (req,res,next) => {
 router.put('/:id/category', (req,res,next) => {
 	let id = req.params['id']
 	let category = req.body.category
-	console.log(category)
-	product.update({_id: id}, {$set: {category}}, (err,result) => {
+	if (!category) {
+		return next(customError(400, '指定的分类不能为空'))
+	}
+	product.update({_id: id}, {$set: {categoryId: category.id, subCategoryId: category.subId}}, (err,result) => {
 		if (err) return next(customError(400, err.message))
 		res.json(result)
 	})

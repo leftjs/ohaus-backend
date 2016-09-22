@@ -130,7 +130,7 @@ class Product extends React.Component {
 					filterCount: `${item.filter.length}个`,
 					effectCount: `${item.effect.length}个`,
 					category:
-							<DropdownButton bsSize="xsmall" bsStyle="default" title={!!this.state.categories ? this._getCategoryFromId(item.category, this.state.categories) : '未知'} noCaret>
+							<DropdownButton bsSize="xsmall" bsStyle="default" title={!!this.state.categories ? this._getCategoryFromId({id: item.categoryId, subId: item.subCategoryId}, this.state.categories) : '未知'} noCaret>
 								{ !!this.state.categories ? this._renderCategoryDropDown(item._id, this.state.categories) : null}
 							</DropdownButton>,
 					operation: <div>
