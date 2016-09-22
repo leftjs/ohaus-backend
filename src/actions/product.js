@@ -195,7 +195,7 @@ export const updateProductCategoryById = ({id, category}) => {
 	return dispatch => dispatch({
 		type: types.UPDATE_PRODUCT_CATEGORY_BY_ID,
 		payload: new Promise((resolve, reject) => {
-			req.put(`/api/products/${id}/category`, {id: category.id, subId: category.subId}).then((data) => {
+			req.put(`/api/products/${id}/category`, {category: {id: category.id, subId: category.subId}}).then((data) => {
 				resolve(data)
 			}).catch((err) => {
 				reject(err)

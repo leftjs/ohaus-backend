@@ -254,6 +254,7 @@ router.get('/:id', (req,res,next) => {
 router.put('/:id/category', (req,res,next) => {
 	let id = req.params['id']
 	let category = req.body.category
+	console.log(category)
 	product.update({_id: id}, {$set: {category}}, (err,result) => {
 		if (err) return next(customError(400, err.message))
 		res.json(result)
@@ -362,5 +363,6 @@ router.put('/:id/desc', (req,res,next) => {
 		})
 	})
 })
+
 
 export default router

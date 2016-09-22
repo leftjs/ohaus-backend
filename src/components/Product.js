@@ -63,20 +63,45 @@ class Product extends React.Component {
 
 	_handleCategorySelect = (productId, categoryId, subCategoryId) => {
 		// TODO 分类选择
+		this.props.actions.updateProductCategoryById({id: productId , category: {id: categoryId, subId: subCategoryId}}).then((res) => {
+			this._fetchProductListByPageAndSize({page: this.state.currentPage, size: this.state.sizePerPage})
+
+		}).catch((err) => {
+			err.res.then((value) => {
+				Alert.error(value.message)
+			})
+		})
 	}
 
 	_getCategoryFromId = (category = {}, categories) => {
+		if (category == null) {
+			category = {}
+		}
+
+		console.log(categories, category)
 		let {id, subId} = category
 		if (!id && !subId) {
 			return '请选择'
 		} else {
-			let firstCategory = _.takeWhile(categories, (item) => {
-				return item._id == id
+			let firstCategory = null
+			let subCategory = null
+			_.forEach(categories, (item) => {
+				if (item._id == id) {
+					firstCategory = item
+				}
 			})
-			let subCategory = _.takeWhile(categories, (item) => {
-				return item._id == subId
-			})
-			return `${firstCategory} - ${subCategory}`
+			if (!!firstCategory) {
+				_.forEach(firstCategory.subs, (item) => {
+					if (item._id == subId) {
+						subCategory = item
+					}
+				})
+			}
+			if (!!firstCategory && !!subCategory) {
+				return `${firstCategory.name} - ${subCategory.name}`
+			}else {
+				return '请选择'
+			}
 		}
 	}
 
@@ -193,12 +218,12 @@ class Product extends React.Component {
 							>
 								<TableHeaderColumn isKey={true} dataField="_id" dataAlign="center">产品编号</TableHeaderColumn>
 								<TableHeaderColumn dataField="name" dataAlign="center" >产品名称</TableHeaderColumn>
-								<TableHeaderColumn dataField="category" dataAlign="center" columnClassName="td-overflow-visible" >分类</TableHeaderColumn>
+								<TableHeaderColumn width={200} dataField="category" dataAlign="center" columnClassName="td-overflow-visible" >分类</TableHeaderColumn>
 								<TableHeaderColumn dataField="imageCount" dataAlign="center" >配图数量</TableHeaderColumn>
 								<TableHeaderColumn dataField="dataCount" dataAlign="center">筛选项数量</TableHeaderColumn>
 								<TableHeaderColumn dataField="filterCount" dataAlign="center">过滤项数量</TableHeaderColumn>
 								<TableHeaderColumn dataField="effectCount" dataAlign="center">变化项数量</TableHeaderColumn>
-								<TableHeaderColumn dataField="operation" dataAlign="center">操作</TableHeaderColumn>
+								<TableHeaderColumn  dataField="operation" dataAlign="center">操作</TableHeaderColumn>
 							</BootstrapTable>
 						</Panel>
 					</Col>
