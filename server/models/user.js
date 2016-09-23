@@ -5,16 +5,11 @@ import mongoose from 'mongoose'
 const Schema = mongoose.Schema
 
 const userSchema = Schema({
-	username: {
-		type: String,
-		required: true,
-		index:{
-			unique: true
-		}
-	}, // 用户名
+	avatar: {
+		type:String
+	},
 	password: {
 		type: String,
-		required: true
 	}, // 密码
 	name: {
 		type: String,
@@ -32,13 +27,27 @@ const userSchema = Schema({
 		type: String,
 		required: true
 	},
+	province: {
+		type: String,
+		required: true
+	},
 	city: {
 		type: String,
 		required: true
 	},
 	phone: {
 		type: String,
-		required: true
+		required: true,
+		index:{
+			unique: true
+		}
+	},
+	isValidated: {
+		type: Boolean,
+		default: false
+	},
+	helpBy: {
+		type: String,
 	}
 
 })

@@ -124,25 +124,7 @@
 	}
 	```
 	
-3. 用户登陆
-
-	desc: 判断传入的用户名和密码是否正确，验证结果通过返回信息来反馈
-	
-	url: (baseUrl)/api/users/login
-	
-	method: POST
-	
-	params: 
-	
-	* username(body): 用户名
-	* password(body): 密码
-	
-	return:
-	
-	* 200: 用户名密码正确
-	* 40X: 用户名或密码错误
-	
-4. 获取所有分类
+3. 获取所有分类
 	
 	desc: 获取产品的所有分类
 	
@@ -168,6 +150,113 @@
 	... // more
 	]
 	```
+
+
+4. 文件/头像上传
+	
+	desc: 文件或头像的上传，比如在用户注册时，需要单独将头像提交到此接口中，然后将返回后的url存成用户的头像字段
+	
+	url: (baseUrl)/api/upload/single
+	
+	method: POST
+	
+	params: 
+	
+	* file(FormData): 待上传的文件
+	
+	return:
+	
+	* 200: 文件的url
+	
+	* 40X: 文件上传失败
+	
+	
+
+5. 用户注册
+	
+	desc: 根据传入的信息进行用户注册，以手机号码作为唯一性的判断依据，如果号码已经存在则会返回400错误，提示用户已存在，注册成功后，会将密码以短信形式发送到指定的手机号码，待后台审核通过后，该账户即可登录app，此外，如果短信发送失败，默认会忽略本次提交的注册信息，下次注册可以仍用此号码。
+	
+	url: (baseUrl)/api/users/register
+	
+	method: POST
+	
+	params: 
+	
+	* **avatar(body): 头像**
+	* name(body): 姓名
+	* email(body): 邮箱
+	* phone(body): 手机号码
+	* company(body): 公司名称
+	* province(body): 省份
+	* city(body): 城市
+	* job(body): 职务
+	
+	return:
+	
+	* 200: 注册成功
+	* 400: 该手机号码已经注册、注册失败
+
+6. 帮忙注册
+
+	desc: 帮助其他用户进行注册，注册信息同某用户直接注册一样，此外头像不需要传入，可由对应用户以后自己登陆上传。
+	
+	url: (baseUrl)/api/users/:id/help/register
+	
+	method: POST
+	
+	params: 
+	
+	* id(path): 帮忙用户的id
+	* name(body): 姓名
+	* email(body): 邮箱
+	* phone(body): 手机号码
+	* company(body): 公司名称
+	* province(body): 省份
+	* city(body): 城市
+	* job(body): 职务
+	
+	return:
+	
+	* 200: 注册成功
+	* 400: 该手机号码已经注册、注册失败
+
+
+7. 用户登陆
+
+	desc: 判断传入的用户名和密码是否正确，验证结果通过返回信息来反馈，**服务端不做token生成和验证，所有api的调用均没有身份限制，能否调用由客户端进行判断**
+	
+	url: (baseUrl)/api/users/login
+	
+	method: POST
+	
+	params: 
+	
+	* phone(body): 手机号码
+	* password(body): 密码
+	
+	return:
+	
+	* 200: 用户名密码正确
+	* 400: 用户名或密码错误、登录
+	* **401: 该用户尚未通过审核**
+	
+8. 用户头像上传、更改
+
+	desc: 指定需要上传头像的用户id，上传头像即可
+	
+	url: (baseUrl)/api/users/:id/avatar/upload
+	
+	method: POST
+	
+	params: 
+	
+	* id(path): 需要上传头像的用户id
+	* avatar(FormData): 头像图片
+	
+	return:
+	
+	* 200: 更新成功
+	* 400: 更新失败 
 
 
 	

@@ -1,37 +1,102 @@
 var express = require('express');
 var router = express.Router();
 import User from '../models/user'
-
+import { uploadMiddleware, uploadSingleWithFile } from '../utils/ossUtils'
+import * as yunpianUtils from '../utils/yunpianUtils'
 /**
  * 注册
  */
 router.post('/register', (req,res,next) => {
-	let username = req.body.username
-	let password = req.body.password
+	let avatar = req.body.avatar
 	let name = req.body.name
 	let email = req.body.email
 	let company = req.body.company
 	let job = req.body.job
 	let city = req.body.city
 	let phone = req.body.phone
-	User.create({username, password, name, email, company, job, city, phone}, (err,user) => {
-		console.log(err)
-		if(err) return next(customError(400, err.message))
-		if(!user) return next(customError(400, '用户创建出错'))
-		res.json(user)
+	let province = req.body.province
+	let password = Math.random().toString(36).slice(2).replace(/\d/g,'').slice(0,6)
+	User.create({avatar, name, email, company, job, city, phone, province, password}, (err,user) => {
+		if(err) {
+			if (/phone(.*)dup/.test(err.message)) return next(customError(400, '该手机号码已经注册'))
+			return next(customError(400, err.message))
+		}
+
+		yunpianUtils.sendPassToMobile(password, phone).then((result) => {
+			return res.json(result)
+		}).catch((err) => {
+			// 短信下发失败时删除本用户
+			User.remove({_id: user._id})
+			err.res.then((value) => {
+				return next(customError(400, JSON.stringify({msg: value.msg, detail: value.detail})))
+			})
+		})
+
 	})
 })
+
 
 /**
  * 登陆
  */
 router.post('/login', (req,res, next) => {
-	let username = req.body.username
+	let phone = req.body.phone
 	let password = req.body.password
-	User.findOne({username, password}, (err, user) => {
+	User.findOne({phone, password}, (err, user) => {
 		if(err) return next(customError(400, err.message))
 		if(!user) return next(customError(400, '用户登陆失败'))
+		if(!user.isValidated) return next(customError(401, '该用户尚未通过审核'))
 		res.json('用户登陆成功')
+	})
+})
+
+/**
+ * 帮忙注册
+ */
+router.post('/:id/help/register', (req,res,next) => {
+	let id = req.params['id']
+	let name = req.body.name
+	let email = req.body.email
+	let company = req.body.company
+	let job = req.body.job
+	let city = req.body.city
+	let phone = req.body.phone
+	let province = req.body.province
+	let password = Math.random().toString(36).slice(2).replace(/\d/g,'').slice(0,6)
+	User.create({name, email, company, job, city, phone, province, password, helpBy:id}, (err,user) => {
+		if(err) {
+			if (/phone(.*)dup/.test(err.message)) return next(customError(400, '该手机号码已经注册'))
+			return next(customError(400, err.message))
+		}
+
+		yunpianUtils.sendPassToMobile(password, phone).then((result) => {
+			return res.json(result)
+		}).catch((err) => {
+			// 短信下发失败时删除本用户
+			User.remove({_id: user._id})
+			err.res.then((value) => {
+				return next(customError(400, JSON.stringify({msg: value.msg, detail: value.detail})))
+			})
+		})
+
+	})
+
+})
+
+/**
+ * 为指定用户上传头像
+ */
+router.post("/:id/avatar/upload",uploadMiddleware.single('avatar') ,(req,res,next) => {
+	let id = req.params['id']
+	uploadSingleWithFile(req.file).then((result) => {
+		User.update({_id: id}, {$set: {
+			avatar: result
+		}}, (err, changeCount) => {
+			if(err) return next(customError(400, err.message))
+			res.json('更新成功')
+		})
+	}).catch((err) => {
+		return next(customError(400,err.message))
 	})
 })
 

@@ -7,7 +7,8 @@ import config from '../config'
 const ossConfig = config.oss
 import _ from 'lodash'
 import uuid from 'node-uuid'
-
+var multer = require('multer')
+var storage = multer.memoryStorage()
 
 var client = new OSS({
 	region: ossConfig.region,
@@ -48,3 +49,4 @@ export const uploadMultiple = (files) => {
 }
 
 
+export const uploadMiddleware = multer({ storage: storage })
