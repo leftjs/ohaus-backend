@@ -24,7 +24,7 @@ router.put('/zip', upload.single('file'), (req,res,next) => {
 	let zipEntries = zip.getEntries()
 	let productData = {
 		name: '',
-		images: {},
+		images: [],
 		data: [],
 		filter: [], // 筛选项
 		effect: [] // 变化项
@@ -59,9 +59,19 @@ router.put('/zip', upload.single('file'), (req,res,next) => {
 					productData.data = _.map(productData.data, (item,index) => {
 						return {
 							...item,
-							id: index
 						}
 					})
+					productData.data = _.map(productData.data, (item) => {
+						return {
+							detail: _.map(item, (value, key) => {
+								return {
+									name: key,
+									value
+								}
+							})
+						}
+					})
+
 					let json2 = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[1]])
 					let jsonResult = _.reduce(json2, (result,item) => {
 						return _.mergeWith(result, item, (objValue, srcValue) => {
@@ -109,10 +119,13 @@ router.put('/zip', upload.single('file'), (req,res,next) => {
 		}
 		if(zipEntries.length - 1 == index) {
 			// 最后一个遍历完成
-			Promise.all((_.map(prepareToUpload, (item) => {
+			Promise.all((_.map(prepareToUpload, (item,index) => {
 				// console.log(item.data)
 				return ossUtils.uploadSingleWithBuffer(item.data, item.suffix).then((url) => {
-					productData.images[item.name] = url
+					productData.images.push({
+						name: item.name,
+						url
+					})
 				})
 			})).concat([new Promise((resolve, reject) => {
 				mammoth.convertToHtml(prepareDescInfo.data, prepareDescInfo.options).then((res) => {
@@ -240,7 +253,10 @@ router.post('/:id/image/upload', upload.single('file'), (req,res,next) => {
 		if (err) return next(customError(400, err.message))
 		if (!doc) return next(customError(400, "找不到该产品,请检查"))
 		ossUtils.uploadSingleWithFile(req.file).then((url) => {
-			doc.images[req.file.originalname.replace(/(\.|-)/g, '_')] = url
+			doc.images.push({
+				name: req.file.originalname.replace(/(\.|-)/g, '_'),
+				url
+			})
 			product.update({_id: doc._id}, {$set: {
 				images: doc.images
 			}},(err, result) => {
@@ -261,13 +277,15 @@ router.post('/:id/image/upload', upload.single('file'), (req,res,next) => {
 /**
  * 为指定产品删除某个配图
  */
-router.delete('/:id/image/:name', (req,res,next) => {
+router.delete('/:id/image/:imageId', (req,res,next) => {
 	let id = req.params['id']
-	let name = req.params['name']
+	let imageId = req.params['imageId']
 	product.findOne({_id: id}, (err, doc) => {
 		if (err) return next(customError(400, err.message))
 		if (!doc) return next(customError(400, "找不到该产品,请检查"))
-		delete doc.images[name]
+		_.remove(doc.images, (item) => {
+			return item._id == imageId
+		})
 		product.update({_id: doc._id}, {$set: {
 			images: doc.images
 		}}, (err, result) => {
@@ -317,7 +335,7 @@ router.delete('/:id/data/:no', (req,res,next) => {
 		if (!doc) return next(customError(400, "找不到该产品,请检查"))
 		let data = doc.data
 		data = _.reject(data, (item) => {
-			return item.id == no
+			return item._id == no
 		})
 		product.update({_id: id}, {$set: {
 			data: data
@@ -342,12 +360,22 @@ router.put('/:id/data', (req, res, next) => {
 		if (!doc) return next(customError(400, "找不到该产品,请检查"))
 		let data = doc.data
 		data = _.map(data, (item) => {
-			if (item.id == body.id) {
-				return body
+			if (item._id == body.id) {
+				delete body.id
+				return {
+					_id: item._id,
+					detail: _.map(body, (value, key) => {
+						return {
+							name: key,
+							value
+						}
+					})
+				}
 			}else {
 				return item
 			}
 		})
+
 		product.update({_id: id}, {$set: {
 			data: data
 		}}, (err, result) => {
@@ -368,16 +396,13 @@ router.post('/:id/data', (req,res,next) => {
 		if (err) return next(customError(400, err.message))
 		if (!doc) return next(customError(400, "找不到该产品,请检查"))
 		let data = doc.data
-		let no = -1
-		_.map(data, (item) => {
-			if (item.id > no) {
-				no = item.id
-			}
-		})
-		no++ // 获取最后一个id号
 		data.push({
-			id: no,
-			...body
+			detail: _.map(body, (value, name) => {
+				return {
+					name,
+					value
+				}
+			})
 		})
 		product.update({_id: id}, {$set: {
 			data

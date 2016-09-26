@@ -11,8 +11,18 @@ const productSchema = Schema({
 			unique: true
 		}
 	}, // 名称
-	images: Object, // 配图
-	data: Array, // 全体数据
+	images: [{
+		name: String,
+		url: String
+	}], // 配图
+	data: [
+		{
+			detail: [{
+				name: String,
+				value: String
+			}]
+		}
+	], // 全体数据
 	filter: Array, // 筛选项
 	effect: Array, // 变化项
 	desc: String, // 描述

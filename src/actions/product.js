@@ -78,11 +78,11 @@ export const deleteProductById = (id) => {
  * @param name
  * @returns {function(*): *}
  */
-export const deleteProductImageByName = ({id,name}) => {
+export const deleteProductImageByImageId = ({id,imageId}) => {
 	return dispatch => dispatch({
-		type: types.DELETE_PRODUCT_IMAGE_BY_NAME,
+		type: types.DELETE_PRODUCT_IMAGE_BY_IMAGE_ID,
 		payload: new Promise((resolve, reject) => {
-			req.remove(`/api/products/${id}/image/${name}`).then((data) => {
+			req.remove(`/api/products/${id}/image/${imageId}`).then((data) => {
 				 resolve(data)
 			}).catch((err) => {
 				reject(err)

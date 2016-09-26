@@ -197,7 +197,6 @@ class User extends React.Component {
 						  }}
 						>
 							<TableHeaderColumn dataAlign="center" dataField="_id" isKey={true}>编号</TableHeaderColumn>
-							<TableHeaderColumn dataAlign="center" dataField="username">用户名</TableHeaderColumn>
 							<TableHeaderColumn dataAlign="center" dataField="password">密码</TableHeaderColumn>
 							<TableHeaderColumn dataAlign="center" dataField="name">昵称</TableHeaderColumn>
 							<TableHeaderColumn dataAlign="center" dataField="phone">手机号</TableHeaderColumn>

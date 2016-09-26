@@ -19,9 +19,14 @@ class ProductDetail extends React.Component {
 	loadProductByNetwork(id) {
 		this.props.actions.getSingleProduct(id).then((result) => {
 			let data = _.map(result.value.data, (item) => {
+				let obj = {}
+				_.map(item.detail, (inlineItem) => {
+					obj[inlineItem['name']] = inlineItem.value
+				})
 				return {
-					...item,
-					operation: <Button bsStyle="danger" bsSize="xsmall" onClick={this._handleDeleteProductDataById.bind(this, id, item.id)}>删除</Button>
+					id: item._id,
+					...obj,
+					operation: <Button bsStyle="danger" bsSize="xsmall" onClick={this._handleDeleteProductDataById.bind(this, id, item._id)}>删除</Button>
 				}
 			})
 
@@ -48,7 +53,7 @@ class ProductDetail extends React.Component {
 		_id: '',
 		data: [],
 		filter: [],
-		images: {},
+		images: [],
 		effect: [],
 		showModal: false,
 		item: {}, // 待提交的参数信息
@@ -71,8 +76,8 @@ class ProductDetail extends React.Component {
 
 
 
-  _handleProductImageDelete = (id, name) => {
-  	this.props.actions.deleteProductImageByName({id, name}).then((data) => {
+  _handleProductImageDelete = (id, imageId) => {
+  	this.props.actions.deleteProductImageByImageId({id, imageId}).then((data) => {
 			this.loadProductByNetwork(this.props.params.id)
 		  Alert.success('删除指定配图成功')
 	  }).catch((err) => {
@@ -120,6 +125,7 @@ class ProductDetail extends React.Component {
 				}}>{item}</span></TableHeaderColumn>)
 			})
 		}
+
 		return renderArr
 	}
 
@@ -179,7 +185,7 @@ class ProductDetail extends React.Component {
 							paddingLeft: 15
 						}}>
 								<FileUpload options={{
-								baseUrl:`${config.domain}/api/product/${this.state._id}/image/upload`,
+								baseUrl:`${config.domain}/api/products/${this.state._id}/image/upload`,
 								chooseAndUpload: true,
 								fileFieldName: 'file',
 								uploadSuccess: () => {
@@ -190,15 +196,15 @@ class ProductDetail extends React.Component {
 								</FileUpload>
 							</Row>
 							<Row>
-								{_.map(this.state.images,(value,key) => {
+								{_.map(this.state.images,(value) => {
 									return (
-										<Col xs={12} sm={6} md={4} key={key}>
+										<Col xs={12} sm={6} md={4} key={value._id}>
 											<div style={{
 											border: '1px solid grey',
 											marginTop: 10,
 											padding: 5
 										}}>
-												<Image src={value} responsive style={{
+												<Image src={value.url} responsive style={{
 												height: 200
 											}} />
 												<h4 style={{
@@ -207,9 +213,9 @@ class ProductDetail extends React.Component {
 											overflow: 'hidden',
 											whiteSpace: 'nowrap',
 											textOverflow: 'ellipsis'
-										}}>{key}</h4>
+										}}>{value.name}</h4>
 												<p>
-													<Button bsStyle="danger" onClick={this._handleProductImageDelete.bind(this, this.state._id, key)} block>删除</Button>&nbsp;
+													<Button bsStyle="danger" onClick={this._handleProductImageDelete.bind(this, this.state._id, value._id)} block>删除</Button>&nbsp;
 												</p>
 											</div>
 										</Col>
