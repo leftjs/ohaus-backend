@@ -55,18 +55,25 @@
 		data: [{
 			_id: "57c434cf60dc28aa92be23bc", // 文档编号
 			name: "EX系列天平", // 产品名称
-			images: {
-				"key(图片名称)" : "value(图片的url地址)",
+			images: [{
+				name: "", // 图片名称
+				url: "", // 图片链接
+				_id: "", // 图片编号
 				... // more				
-			}, // 配图
+			}], // 配图
 			desc: String, // 详情的html片段
 			categoryId: String, // 一级分类的id
 			subCategoryId: String, // 二级分类的id			
-			data: [
-				{	id : number,
-					key(参数名) : value(参数值),
-					... // more
-				}
+			data: [{	
+				_id : String, // 参数编号
+				detail: [
+					{
+						name: "", // 参数名称
+						value: "", //参数值
+						_id: '', // 忽略
+					}, ... // more
+				]	
+				}, ... // more
 			], // 产品参数
 			filter: [
 				String, // 产品参数中可用户过滤的参数名
