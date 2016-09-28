@@ -32,7 +32,12 @@ class Category extends React.Component {
 				let mySubs = _.map(item.subs, (inlineItem) => {
 					return {
 						...inlineItem,
-						operation: <Button bsStyle="danger" bsSize="xsmall" onClick={this._handleSubCategoryDelete.bind(this, item._id, inlineItem._id)}>删除</Button>
+						operation:
+							<div>
+								<Button bsStyle="danger" bsSize="xsmall" onClick={this._handleSubCategoryDelete.bind(this, item._id, inlineItem._id)}>删除</Button>
+								// TODO
+								<Button bsStyle="danger" bsSize="xsmall" onClick={!!inlineItem.image ? this._handleViewImage(inlineItem.image) : this._handleUploadImage()}>{!!inlineItem.image ? "查看图片" : "上传图片"}</Button>
+							</div>
 					}
 				})
 				item.subs = mySubs

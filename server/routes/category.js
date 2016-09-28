@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 import Category from '../models/category'
 import _ from 'lodash'
+import * as ossUtils from '../utils/ossUtils'
 
 /**
  * 添加一级分类
@@ -42,6 +43,7 @@ router.post('/add/:id/sub', (req,res,next) => {
 		})
 	})
 })
+
 
 /**
  * 删除指定一级分类
@@ -97,6 +99,35 @@ router.put('/:id/sub', (req, res, next) => {
 			console.log(result)
 			res.json(result)
 		})
+	})
+})
+
+/**
+ * 更新指定分类的二级分类的图片
+ */
+router.put('/:id/sub/:sub', ossUtils.uploadMiddleware.single('file'), (req,res,next) => {
+	let id = req.params['id']
+	let sub = req.params['sub']
+	let file = req.file
+	ossUtils.uploadSingleWithFile(file).then((url) => {
+		Category.findOne({_id: id}, (err,doc) => {
+			let subs = _.map(doc.subs, (item) => {
+				if (item._id == sub) {
+					return {
+						...item,
+						image: url
+					}
+				}else {
+					return item
+				}
+			})
+
+			Category.update({_id: id}, {$set: {subs}}, (err, result) => {
+				res.json(result)
+			})
+		})
+	}).catch((err) => {
+		return next(customError(400, err.message))
 	})
 })
 

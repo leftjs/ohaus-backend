@@ -2,6 +2,7 @@
  * Created by zhangjiasheng on 16/8/26.
  */
 import mongoose from 'mongoose'
+import _ from 'lodash'
 const Schema = mongoose.Schema
 
 const productSchema = Schema({
@@ -28,6 +29,22 @@ const productSchema = Schema({
 	desc: String, // 描述
 	categoryId: String, // 一级分类
 	subCategoryId: String, // 二级分类
+
+})
+productSchema.set('toJSON', { getters: true, virtuals: true });
+productSchema.virtual('minimumPrice').get(function() {
+	return _.minBy(_.compact(_.map(this.data, (item1) => {
+		let detail = item1.detail
+		if (!!detail) {
+			return _.find(detail, (item2) => {
+				return item2.name === '列表价RMB'
+			})
+		}else {
+			return null
+		}
+	})), (item3) => {
+		return _.toInteger(item3.value)
+	}).value
 })
 
 export default mongoose.model('Product', productSchema)

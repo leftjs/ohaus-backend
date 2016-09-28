@@ -117,6 +117,26 @@ export const updateSubCategory = ({id, row}) => {
 }
 
 /**
+ * 更新指定二级分类的图片
+ * @param id
+ * @param sub
+ * @param data
+ * @returns {function(*): *}
+ */
+export const updateSubCategoryImage = ({id, sub, data}) => {
+	return dispatch => dispatch({
+		type: types.UPDATE_CATEGORY_SUB_IMAGE,
+		payload: new Promise((resolve, reject) => {
+			req.upload(`/api/category/${id}/sub/${sub}`, data).then((res) => {
+				resolve(res)
+			}).catch((err) => {
+				reject(err)
+			})
+		})
+	})
+}
+
+/**
  * 更新指定分类的名称
  * @param id
  * @param name
