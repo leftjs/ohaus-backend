@@ -6,8 +6,10 @@ const Schema = mongoose.Schema
 const subCategorySchema = Schema({
 	name: {
 		type: String,
-	}
+	},
+	image: String
 })
+
 const categorySchema = Schema({
 	name: {
 		type: String,
