@@ -11,6 +11,8 @@ import _ from 'lodash'
 import xlsx from 'xlsx'
 import product from '../models/product'
 import mammoth from 'mammoth'
+import i18n from '../config/i18n'
+
 
 require('shelljs/global')
 
@@ -53,7 +55,14 @@ router.put('/zip', upload.single('file'), (req,res,next) => {
 					productData.data = _.map(xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]), (item) => {
 						return _.transform(item, (result, value, key) => {
 							// 去除键值的首尾空格
-							result[key.trim()] = value.trim()
+							let i18Name = i18n[key.trim()]
+							if(!!i18Name){
+								if(i18Name === 'price') {
+									result[i18Name] = parseInt(_.replace(value.trim(), /,/g, ''))
+								}else {
+									result[i18Name] = value.trim()
+								}
+							}
 						}, {})
 					})
 					productData.data = _.map(productData.data, (item,index) => {
@@ -66,7 +75,7 @@ router.put('/zip', upload.single('file'), (req,res,next) => {
 					let jsonResult = _.reduce(json2, (result,item) => {
 						return _.mergeWith(result, item, (objValue, srcValue) => {
 							let array = []
-							return _.compact(array.concat(objValue, srcValue.trim()))
+							return _.compact(array.concat(objValue, i18n[srcValue.trim()]))
 						})
 					},{})
 					productData.filter = jsonResult['筛选项']
