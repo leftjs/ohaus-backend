@@ -10,6 +10,7 @@ import * as ossUtils from '../utils/ossUtils'
 import _ from 'lodash'
 import xlsx from 'xlsx'
 import product from '../models/product'
+import category from '../models/category'
 import mammoth from 'mammoth'
 import i18n from '../config/i18n'
 
@@ -155,6 +156,42 @@ router.get('/list/all',(req, res, next) => {
 	})
 })
 
+const prettifyOutput = ({list, count, size, page, categories, res}) => {
+	return res.json({
+		data: _.map(list, (item) => {
+			let categoryId2 = item.categoryId
+			let subCategoryId2 = item.subCategoryId
+			let inlineCategory = _.find(categories, (c) => {
+				return c._id.toString() === categoryId2
+			})
+			let inlineSubCategory = _.find(inlineCategory.subs, (sc) => {
+				return sc._id.toString() === subCategoryId2
+			})
+
+			let copyItem = {...item.toJSON()}
+			// delete copyItem.categoryId
+			// delete copyItem.subCategoryId
+
+			let {images} = copyItem
+			return {
+				...copyItem,
+				newImages: _.map(images, (value, key) => {
+					return {
+						name: key,
+						url: value
+					}
+				}),
+				category:inlineCategory.name,
+				subCategory: inlineSubCategory.name
+			}
+
+		}),
+		totalDataSize: count,
+		sizePerPage: parseInt(size),
+		currentPage: parseInt(page)
+	})
+}
+
 /**
  * 分页获取产品列表
  */
@@ -164,59 +201,42 @@ router.get('/list', (req,res,next) => {
 	let categoryId = req.query['cid']
 	let subCategoryId = req.query['scid']
 	if (page < 1) page = 1
-	if (!!categoryId && !subCategoryId) {
-		product.count({categoryId}, (err, count) => {
-			if(err) return next(customError(400, err.message))
-			product.find({categoryId}).skip(parseInt((page - 1 ) * size)).limit(parseInt(size)).exec((err, list) => {
+	category.find({}).exec((err1, categories) => {
+		if (!!categoryId && !subCategoryId) {
+			product.count({categoryId}, (err, count) => {
 				if(err) return next(customError(400, err.message))
-				res.json({
-					data: list,
-					totalDataSize: count,
-					sizePerPage: parseInt(size),
-					currentPage: parseInt(page)
+				product.find({categoryId}).skip(parseInt((page - 1 ) * size)).limit(parseInt(size)).exec((err, list) => {
+					if(err) return next(customError(400, err.message))
+					prettifyOutput({list, count, size, page, categories, res})
 				})
 			})
-		})
-	} else if (!!categoryId && !!subCategoryId) {
-		product.count({categoryId, subCategoryId}, (err, count) => {
-			if(err) return next(customError(400, err.message))
-			product.find({categoryId, subCategoryId}).skip(parseInt((page - 1 ) * size)).limit(parseInt(size)).exec((err, list) => {
+		} else if (!!categoryId && !!subCategoryId) {
+			product.count({categoryId, subCategoryId}, (err, count) => {
 				if(err) return next(customError(400, err.message))
-				res.json({
-					data: list,
-					totalDataSize: count,
-					sizePerPage: parseInt(size),
-					currentPage: parseInt(page)
+				product.find({categoryId, subCategoryId}).skip(parseInt((page - 1 ) * size)).limit(parseInt(size)).exec((err, list) => {
+					if(err) return next(customError(400, err.message))
+					prettifyOutput({list, count, size, page, categories, res})
 				})
 			})
-		})
-	} else if (!!subCategoryId && !categoryId) {
-		product.count({subCategoryId}, (err, count) => {
-			if(err) return next(customError(400, err.message))
-			product.find({subCategoryId}).skip(parseInt((page - 1 ) * size)).limit(parseInt(size)).exec((err, list) => {
+		} else if (!!subCategoryId && !categoryId) {
+			product.count({subCategoryId}, (err, count) => {
 				if(err) return next(customError(400, err.message))
-				res.json({
-					data: list,
-					totalDataSize: count,
-					sizePerPage: parseInt(size),
-					currentPage: parseInt(page)
+				product.find({subCategoryId}).skip(parseInt((page - 1 ) * size)).limit(parseInt(size)).exec((err, list) => {
+					if(err) return next(customError(400, err.message))
+					prettifyOutput({list, count, size, page, categories, res})
 				})
 			})
-		})
-	} else {
-		product.count({}, (err, count) => {
-			if(err) return next(customError(400, err.message))
-			product.find({}).skip(parseInt((page - 1 ) * size)).limit(parseInt(size)).exec((err, list) => {
+		} else {
+			product.count({}, (err, count) => {
 				if(err) return next(customError(400, err.message))
-				res.json({
-					data: list,
-					totalDataSize: count,
-					sizePerPage: parseInt(size),
-					currentPage: parseInt(page)
+				product.find({}).skip(parseInt((page - 1 ) * size)).limit(parseInt(size)).exec((err, list) => {
+					if(err) return next(customError(400, err.message))
+					prettifyOutput({list, count, size, page, categories, res})
 				})
 			})
-		})
-	}
+		}
+	})
+
 })
 
 /**

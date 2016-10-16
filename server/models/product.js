@@ -23,19 +23,11 @@ const productSchema = Schema({
 })
 productSchema.set('toJSON', { getters: true, virtuals: true });
 productSchema.virtual('minimumPrice').get(function() {
-	// console.log(_.compact(_.map(this.data, (item1) => {
-	// 	let detail = item1.detail
-	// 	if (!!detail) {
-	// 		return _.find(detail, (item2) => {
-	// 			return item2.name === '列表价RMB'
-	// 		})
-	// 	}else {
-	// 		return null
-	// 	}
-	// })))
-	// return _.minBy(, (item3) => {
-	// 	return _.toInteger(item3.value)
-	// }).value
+	let prices = _.map(this.data, (item) => {
+		return item.price
+	})
+	return _.min(prices)
+
 })
 
 export default mongoose.model('Product', productSchema)
